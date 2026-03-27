@@ -22,55 +22,64 @@ function App() {
           id: Date.now() - 1,
           country: 'Япония',
           title: 'Сакура в Токио',
-          description: 'Наслаждение цветением сакуры и знакомство с японской культурой'
+          description: 'Наслаждение цветением сакуры и знакомство с японской культурой',
+          likes: 16
         },
         {
           id: Date.now() - 2,
           country: 'Италия',
           title: 'Романтическая Венеция',
-          description: 'Путешествие по каналам и мостам самого романтичного города Италии'
+          description: 'Путешествие по каналам и мостам самого романтичного города Италии',
+          likes: 8
         },
         {
           id: Date.now() - 3,
           country: 'Норвегия',
           title: 'Лофотенские острова',
-          description: 'Рыбацкие деревушки, горы и пляжи с бирюзовой водой за полярным кругом'
+          description: 'Рыбацкие деревушки, горы и пляжи с бирюзовой водой за полярным кругом',
+          likes: 17
         },
         {
           id: Date.now() - 4,
           country: 'Таиланд',
           title: 'Чиангмай и горные племена',
-          description: 'Знакомство с культурой северного Таиланда, храмы и слоны'
+          description: 'Знакомство с культурой северного Таиланда, храмы и слоны',
+          likes: 15
         },
         {
           id: Date.now() - 5,
           country: 'Италия',
           title: 'Побережье Амальфи',
-          description: 'Живописные скалы, лимонные рощи и яркие домики на скалах'
+          description: 'Живописные скалы, лимонные рощи и яркие домики на скалах',
+          likes: 21
         },
         {
           id: Date.now() - 6,
           country: 'Норвегия',
           title: 'Фьорды и северное сияние',
-          description: 'Круиз по живописным фьордам, охота за авророй и прогулки по Тролльской тропе'
+          description: 'Круиз по живописным фьордам, охота за авророй и прогулки по Тролльской тропе',
+          likes: 7
         },
         {
           id: Date.now() - 7,
           country: 'Италия',
           title: 'Тосканские холмы',
-          description: 'Дегустация вин Кьянти, средневековые городки и кипарисовые аллеи'
+          description: 'Дегустация вин Кьянти, средневековые городки и кипарисовые аллеи',
+          likes: 11
         },
         {
           id: Date.now() - 8,
           country: 'Таиланд',
           title: 'Острова Пхукета',
-          description: 'Отдых на белоснежных пляжах и дайвинг в Андаманском море'
+          description: 'Отдых на белоснежных пляжах и дайвинг в Андаманском море',
+          likes: 12
         },
         {
           id: Date.now() - 9,
           country: 'Исландия',
           title: 'Голубая лагуна',
-          description: 'Релакс в геотермальных источниках и северное сияние'
+          description: 'Релакс в геотермальных источниках и северное сияние',
+          likes: 5
         }
       ];
       setTravels(initialTravels);
@@ -91,13 +100,21 @@ function App() {
     : travels.filter(travel => travel.country === selectedCountry);
 
   const handleAddTravel = (newTravel) => {
-    setTravels([...travels, newTravel]);
+    setTravels([...travels, { ...newTravel, likes: 0 }]);
   };
 
   const handleDeleteTravel = (id) => {
     if (window.confirm('Вы уверены, что хотите удалить это путешествие?')) {
       setTravels(travels.filter(travel => travel.id !== id));
     }
+  };
+
+  const handleLike = (id) => {
+    setTravels(travels.map(travel =>
+      travel.id === id 
+        ? { ...travel, likes: travel.likes + 1 }
+        : travel
+    ));
   };
 
   return (
@@ -137,6 +154,7 @@ function App() {
               key={travel.id} 
               travel={travel}
               onDoubleClick={() => handleDeleteTravel(travel.id)}
+              onLike={handleLike}
             />
           ))}
         </div>
