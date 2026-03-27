@@ -1,8 +1,8 @@
 import React from 'react';
 
-function TravelCard({ travel }) {
+function TravelCard({ travel, onDoubleClick }) {
   return (
-    <div className="travel-card">
+    <div className="travel-card" onDoubleClick={onDoubleClick}>
       <div className="card-header">
         <span className="country-badge">{travel.country}</span>
       </div>
