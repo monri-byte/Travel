@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import TravelCard from './components/TravelCard';
+import Filter from './components/Filter';
+import { ContactsModal, PaymentModal } from './components/Modals';
 
 function App() {
+  const [showContacts, setShowContacts] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState('Все');
+
   const travels = [
     {
       id: Date.now() - 1,
@@ -60,18 +66,42 @@ function App() {
     }
   ];
 
+  const countries = ['Все', ...new Set(travels.map(travel => travel.country))];
+
+  const filteredTravels = selectedCountry === 'Все' 
+    ? travels 
+    : travels.filter(travel => travel.country === selectedCountry);
+
   return (
     <div className="App">
       <header className="app-header">
         <h1>Каталог путешествий</h1>
+        <div className="header-buttons">
+          <button className="header-btn" onClick={() => setShowContacts(true)}>
+            Контакты
+          </button>
+          <button className="header-btn" onClick={() => setShowPayment(true)}>
+            Способы оплаты
+          </button>
+        </div>
       </header>
+
       <main className="main-content">
+        <Filter 
+          countries={countries}
+          selectedCountry={selectedCountry}
+          onCountryChange={setSelectedCountry}
+        />
+
         <div className="travels-grid">
-          {travels.map(travel => (
+          {filteredTravels.map(travel => (
             <TravelCard key={travel.id} travel={travel} />
           ))}
         </div>
       </main>
+
+      <ContactsModal isOpen={showContacts} onClose={() => setShowContacts(false)} />
+      <PaymentModal isOpen={showPayment} onClose={() => setShowPayment(false)} />
     </div>
   );
 }
