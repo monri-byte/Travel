@@ -16,7 +16,7 @@ function App() {
       country: 'Япония',
       title: 'Сакура в Токио',
       description: 'Наслаждение цветением сакуры и знакомство с японской культурой',
-      likes: 21
+      likes: 15
     },
     {
       id: Date.now() - 2,
@@ -30,7 +30,7 @@ function App() {
       country: 'Норвегия',
       title: 'Лофотенские острова',
       description: 'Рыбацкие деревушки, горы и пляжи с бирюзовой водой за полярным кругом',
-      likes: 7
+      likes: 9
     },
     {
       id: Date.now() - 4,
@@ -44,68 +44,132 @@ function App() {
       country: 'Италия',
       title: 'Побережье Амальфи',
       description: 'Живописные скалы, лимонные рощи и яркие домики на скалах',
-      likes: 15
+      likes: 21
     },
     {
       id: Date.now() - 6,
       country: 'Норвегия',
       title: 'Фьорды и северное сияние',
       description: 'Круиз по живописным фьордам, охота за авророй и прогулки по Тролльской тропе',
-      likes: 19
+      likes: 13
     },
     {
       id: Date.now() - 7,
       country: 'Италия',
       title: 'Тосканские холмы',
       description: 'Дегустация вин Кьянти, средневековые городки и кипарисовые аллеи',
-      likes: 5
+      likes: 6
     },
     {
       id: Date.now() - 8,
       country: 'Таиланд',
       title: 'Острова Пхукета',
       description: 'Отдых на белоснежных пляжах и дайвинг в Андаманском море',
-      likes: 9
+      likes: 11
     },
     {
       id: Date.now() - 9,
       country: 'Исландия',
       title: 'Голубая лагуна',
       description: 'Релакс в геотермальных источниках и северное сияние',
-      likes: 11
+      likes: 5
     }
   ]);
 
-  const countries = ['Все', ...new Set(travels.map(travel => travel.country))];
+  // Получаем уникальные страны
+  function getUniqueCountries() {
+    var countryList = [];
+    countryList.push('Все');
+    
+    for (var i = 0; i < travels.length; i++) {
+      var country = travels[i].country;
+      var alreadyExists = false;
+      
+      for (var j = 0; j < countryList.length; j++) {
+        if (countryList[j] === country) {
+          alreadyExists = true;
+          break;
+        }
+      }
+      
+      if (!alreadyExists) {
+        countryList.push(country);
+      }
+    }
+    
+    return countryList;
+  }
+  var countries = getUniqueCountries();
 
-  const filteredTravels = selectedCountry === 'Все' 
-    ? travels 
-    : travels.filter(travel => travel.country === selectedCountry);
+  // Фильтрация путешествий
+  var filteredTravels;
+  if (selectedCountry === 'Все') {
+    filteredTravels = travels;
+  } else {
+    filteredTravels = [];
+    for (var i = 0; i < travels.length; i++) {
+      if (travels[i].country === selectedCountry) {
+        filteredTravels.push(travels[i]);
+      }
+    }
+  }
 
-  const handleAddTravel = (newTravel) => {
-    setTravels([...travels, { ...newTravel, likes: 0 }]);
-  };
+  // Добавление нового путешествия
+  function handleAddTravel(newTravel) {
+    var newTravelsList = [];
+    
+    for (var i = 0; i < travels.length; i++) {
+      newTravelsList.push(travels[i]);
+    }
+    
+    var travelWithLikes = {
+      id: newTravel.id,
+      country: newTravel.country,
+      title: newTravel.title,
+      description: newTravel.description,
+      likes: 0
+    };
+    
+    newTravelsList.push(travelWithLikes);
+    setTravels(newTravelsList);
+  }
 
-  const handleLike = (id) => {
-    setTravels(travels.map(travel =>
-      travel.id === id 
-        ? { ...travel, likes: travel.likes + 1 }
-        : travel
-    ));
-  };
+  // Увеличение лайка
+  function handleLike(id) {
+    var updatedTravels = [];
+    
+    for (var i = 0; i < travels.length; i++) {
+      var travel = travels[i];
+      
+      if (travel.id === id) {
+        var likedTravel = {
+          id: travel.id,
+          country: travel.country,
+          title: travel.title,
+          description: travel.description,
+          likes: travel.likes + 1
+        };
+        updatedTravels.push(likedTravel);
+      } else {
+        updatedTravels.push(travel);
+      }
+    }
+    
+    setTravels(updatedTravels);
+  }
 
   return (
     <div className="App">
       <header className="app-header">
         <h1>Каталог путешествий</h1>
         <div className="header-buttons">
-          <button className="header-btn" onClick={() => setShowContacts(true)}>
+          <button className="header-btn" onClick={function() { setShowContacts(true); }}>
             Контакты
           </button>
-          <button className="header-btn" onClick={() => setShowPayment(true)}>
+          <button className="header-btn" onClick={function() { setShowPayment(true); }}>
             Способы оплаты
           </button>
-          <button className="header-btn add-btn" onClick={() => setShowForm(!showForm)}>
+          <button className="header-btn add-btn" onClick={function() { setShowForm(!showForm); }}>
             {showForm ? 'Закрыть форму' : '+ Добавить путешествие'}
           </button>
         </div>
@@ -121,23 +185,30 @@ function App() {
         {showForm && (
           <AddForm 
             onAddTravel={handleAddTravel}
-            onClose={() => setShowForm(false)}
+            onClose={function() { setShowForm(false); }}
           />
         )}
 
         <div className="travels-grid">
-          {filteredTravels.map(travel => (
-            <TravelCard 
-              key={travel.id} 
-              travel={travel}
-              onLike={handleLike}
-            />
-          ))}
+          {function() {
+            var cards = [];
+            for (var i = 0; i < filteredTravels.length; i++) {
+              var travel = filteredTravels[i];
+              cards.push(
+                <TravelCard 
+                  key={travel.id} 
+                  travel={travel}
+                  onLike={handleLike}
+                />
+              );
+            }
+            return cards;
+          }()}
         </div>
       </main>
 
-      <ContactsModal isOpen={showContacts} onClose={() => setShowContacts(false)} />
-      <PaymentModal isOpen={showPayment} onClose={() => setShowPayment(false)} />
+      <ContactsModal isOpen={showContacts} onClose={function() { setShowContacts(false); }} />
+      <PaymentModal isOpen={showPayment} onClose={function() { setShowPayment(false); }} />
     </div>
   );
 }

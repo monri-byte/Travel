@@ -8,23 +8,44 @@ function AddForm({ onAddTravel, onClose }) {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewTravel({ ...newTravel, [name]: value });
+    const name = e.target.name;
+    const value = e.target.value;
+    
+    // Создаем новый объект без spread
+    const updatedTravel = {
+      country: newTravel.country,
+      title: newTravel.title,
+      description: newTravel.description
+    };
+    
+    // Обновляем нужное поле
+    if (name === 'country') {
+      updatedTravel.country = value;
+    } else if (name === 'title') {
+      updatedTravel.title = value;
+    } else if (name === 'description') {
+      updatedTravel.description = value;
+    }
+    
+    setNewTravel(updatedTravel);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (!newTravel.country || !newTravel.title || !newTravel.description) {
+    if (newTravel.country === '' || newTravel.title === '' || newTravel.description === '') {
       alert('Пожалуйста, заполните все поля');
       return;
     }
 
-    onAddTravel({
+    const travelToAdd = {
       id: Date.now(),
-      ...newTravel
-    });
+      country: newTravel.country,
+      title: newTravel.title,
+      description: newTravel.description
+    };
     
+    onAddTravel(travelToAdd);
     onClose();
   };
 
